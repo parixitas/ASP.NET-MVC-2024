@@ -1,0 +1,26 @@
+﻿
+@model TimeZoneConverter.Models.TimeZoneConverterModel
+<div style="margin-top: 30px;">
+    @using (Html.BeginForm("Convert", "Home", FormMethod.Post))
+    {
+        <label for="SelectedDateTime">Select Date and Time:</label>
+        <input type="datetime-local" id="SelectedDateTime" name="SelectedDateTime" value="@Model.SelectedDateTime.ToString("yyyy-MM-ddTHH:mm")" required>
+        <br />
+        <label for="SelectedTimeZone" style="margin-top:15px;">Select Timezone:</label>
+        <select id="SelectedTimeZone" name="SelectedTimeZone">
+            <option value="UTC">UTC</option>
+            <option value="Eastern Standard Time">EST</option>
+            <option value="Pacific Standard Time">PST</option>
+            <!-- Add more timezone options as needed -->
+        </select>
+        <br />
+        <input type="submit" value="Convert" style="margin-top:15px;">
+    }
+
+    @if (ViewBag.msg != "")
+    {
+        <hr />
+        <p>Converted Date and Time: @Model.ConvertedDateTime.ToString("yyyy-MM-dd HH:mm:ss")</p>
+    }
+
+</div>
