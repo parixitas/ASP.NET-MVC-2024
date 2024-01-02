@@ -51,7 +51,7 @@ namespace TimeZoneConverter.Controllers
             string target = "Europe/London";
 
            
-            long utcTimestamp = GetCurrentUnixTimestamp();
+            long utcTimestamp =(long)DateTime.UtcNow.Second;
 
             // Make API request to TimeZoneDb
             string apiUrl = $"http://api.timezonedb.com/v2.1/convert-time-zone?key={apiKey}&from={source}&to={target}&time={utcTimestamp}";
