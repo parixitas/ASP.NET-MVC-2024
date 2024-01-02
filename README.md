@@ -9,4 +9,6 @@ Select timezone to which you convert selected datetime.
 
 --------------------------
 
-
+Two Method implemented for timezone conversion:
+1. Using C# System timezone classes and methods.
+2. Using third party api call: api.timezonedb.com
