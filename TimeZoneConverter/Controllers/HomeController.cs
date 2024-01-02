@@ -40,60 +40,53 @@ namespace TimeZoneConverter.Controllers
             return View("Index", model);
         }
         [HttpPost]
-        public async Task<ActionResult> Convert2Async(TimeZoneConverterModel model)
+        public async Task<ActionResult> Convert2(TimeZoneConverterModel model)
         {
             ViewBag.msg = "test";
 
-            string apiKey = "<your_api_key>";
-
-            // Replace with your source and target timezones
-            string source = "America/New_York";
-            string target = "Europe/London";
-
-           
-            long utcTimestamp =(long)DateTime.UtcNow.Second;
-
-            // Make API request to TimeZoneDb
-            string apiUrl = $"http://api.timezonedb.com/v2.1/convert-time-zone?key={apiKey}&from={source}&to={target}&time={utcTimestamp}";
-
-            try
+            string apiUrl = "https://timeapi.io/api/Conversion/ConvertTimeZone";
+            using (HttpClient client = new HttpClient())
             {
-                HttpResponseMessage response = await client.GetAsync(apiUrl);
-
-                if (response.IsSuccessStatusCode)
+                // Prepare the request payload
+                var requestPayload = new
                 {
-                    string content = await response.Content.ReadAsStringAsync();
+                    fromTimeZone = "Europe/Amsterdam",
+                    dateTime = DateTime.UtcNow.ToString("yyyy-MM-dd HH:MM:ss"),
+                    toTimeZone = "America/Los_Angeles",
+                    dstAmbiguity = ""
+                };
 
-                    // Parse the response
-                    TimeZoneConversionResponse conversionResponse = JsonConvert.DeserializeObject<TimeZoneConversionResponse>(content);
-                    model.ConvertedDateTime = UnixTimeStampToDateTime(conversionResponse.toTimestamp);
+                // Convert the payload to a JSON string
+                string jsonPayload = Newtonsoft.Json.JsonConvert.SerializeObject(requestPayload);
 
-                    //Console.WriteLine($"UTC Time: {UnixTimeStampToDateTime(utcTimestamp)}");
-                    //Console.WriteLine($"Source Time ({source}): {UnixTimeStampToDateTime(conversionResponse.fromTimestamp)}");
-                    //Console.WriteLine($"Target Time ({target}): {UnixTimeStampToDateTime(conversionResponse.toTimestamp)}");
-                }
-                else
+                // Create the HTTP content with the JSON payload
+                HttpContent content = new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json");
+
+                try
                 {
-                    Console.WriteLine($"Error: {response.StatusCode} - {response.ReasonPhrase}");
+                    // Make the POST request
+                    HttpResponseMessage response = await client.PostAsync(apiUrl, content);
+
+                    // Check if the request was successful (status code 200-299)
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Read and print the response content
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine("Response: " + responseBody);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error: " + response.StatusCode);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Exception: " + ex.Message);
+                }
             }
 
             return View("Index", model);
         }
-        private static long GetCurrentUnixTimestamp()
-        {
-            return (long)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-        }
-
-        private static DateTime UnixTimeStampToDateTime(long unixTimeStamp)
-        {
-            return new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(unixTimeStamp);
-        }
-
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
